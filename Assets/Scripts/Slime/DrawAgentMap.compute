@@ -3,9 +3,9 @@
 struct Agent {
 	float2 position;
 	float angle;
-	float4 mask;
-	int speciesIndex;
-	
+	// float4 mask;
+	// int speciesIndex;
+	float4 colour;
 };
 
 RWStructuredBuffer<Agent> agents;
@@ -25,5 +25,5 @@ void DrawAgentMap (uint3 id : SV_DispatchThreadID)
 	// Draw to trail map
 	int cellX = (int)agent.position.x;
 	int cellY = (int)agent.position.y;
-	TargetTexture[int2(cellX, cellY)] = 1;
+	TargetTexture[int2(cellX, cellY)] = agent.colour;
 }

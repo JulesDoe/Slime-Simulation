@@ -3,19 +3,20 @@
 struct Agent {
 	float2 position;
 	float angle;
-	int4 speciesMask;
-	int speciesIndex;
-};
-
-struct SpeciesSettings {
-	float moveSpeed;
-	float turnSpeed;
-
-	float sensorAngleDegrees;
-	float sensorOffsetDst;
-	int sensorSize;
 	float4 colour;
+	// int4 speciesMask;
+	// int speciesIndex;
 };
+
+// struct SpeciesSettings {
+// 	float moveSpeed;
+// 	float turnSpeed;
+
+// 	float sensorAngleDegrees;
+// 	float sensorOffsetDst;
+// 	int sensorSize;
+// 	float4 colour;
+// };
 
 // StructuredBuffer<SpeciesSettings> speciesSettings;
 uint numSpecies;
@@ -65,17 +66,19 @@ float sense(Agent agent, float sensorAngleOffset) {
 
 	float sum = 0;
 
-	int4 senseWeight = agent.speciesMask * 2 - 1;
+	// float4 senseWeight = agent.colour* 2 - 1; // round up to 1,1,1,1 if same species/color ?   
 
 	for (int offsetX = -sensorSize; offsetX <= sensorSize; offsetX ++) {
 		for (int offsetY = -sensorSize; offsetY <= sensorSize; offsetY ++) {
 			int sampleX = min(width - 1, max(0, sensorCentreX + offsetX));
 			int sampleY = min(height - 1, max(0, sensorCentreY + offsetY));
-			sum += dot(senseWeight, TrailMap[int2(sampleX,sampleY)]);
+			// sum += dot(senseWeight, TrailMap[int2(sampleX,sampleY)]); 
+			sum += distance(TrailMap[int2(sampleX,sampleY)], agent.colour);
 		}
 	}
 
-	return sum;
+	return sum * -100;
+	// return sum;
 }
 
 [numthreads(16,1,1)]
@@ -94,8 +97,8 @@ void Update (uint3 id : SV_DispatchThreadID)
 	uint random = hash(pos.y * width + pos.x + hash(id.x + time * 100000));
 
 	uint sensorAngleDegrees = random;
-	float turnSpeed2 = random;
-	float moveSpeed = random;
+	float turnSpeed2 = 10;
+	float moveSpeed = 10;
 	// Steer based on sensory data
 	float sensorAngleRad = sensorAngleDegrees * (3.1415 / 180);
 	float weightForward = sense(agent, 0);
@@ -140,7 +143,7 @@ void Update (uint3 id : SV_DispatchThreadID)
 	else {
 		int2 coord = int2(newPos);
 		float4 oldTrail = TrailMap[coord];
-		TrailMap[coord] = min(1, oldTrail + agent.speciesMask * trailWeight * deltaTime);
+		TrailMap[coord] = min(1, oldTrail + agent.colour * trailWeight * deltaTime);
 	}
 	
 	agents[id.x].position = newPos;
@@ -180,6 +183,7 @@ void Diffuse (uint3 id : SV_DispatchThreadID)
 
 #pragma kernel UpdateColourMap
 RWTexture2D<float4> ColourMap;
+
 [numthreads(8,8,1)]
 void UpdateColourMap (uint3 id : SV_DispatchThreadID)
 {
@@ -189,12 +193,12 @@ void UpdateColourMap (uint3 id : SV_DispatchThreadID)
 
 	float4 map = TrailMap[id.xy];
 
-uint random = hash(id.y * width + id.x + hash(id.x + time * 100000));
-	float4 colour = float4(random, random, random, 1);
+// uint random = hash(id.y * width + id.x + hash(id.x + time * 100000));
+	// float4 colour = float4(random, random, random, 1);
 	// for (uint i = 0; i < numSpecies; i ++) {
 	// 	float4 mask = float4(i==0, i==1, i==2,i==3);
 	// 	colour += speciesSettings[i].colour * dot(map, mask); 
 	// }
-	ColourMap[id.xy] = colour;
+	ColourMap[id.xy] = agents[id.x].colour;
 
 }

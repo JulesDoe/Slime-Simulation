@@ -6,6 +6,8 @@ public class Simulation2 : MonoBehaviour
 {
 	// public enum SpawnMode { Random, Point, InwardCircle, RandomCircle }
 
+public Renderer displayTex;
+public Renderer trailTex;
 	const int updateKernel = 0;
 	const int diffuseMapKernel = 1;
 	const int colourKernel = 2;
@@ -32,7 +34,8 @@ public class Simulation2 : MonoBehaviour
 	protected virtual void Start()
 	{
 		Init();
-		transform.GetComponentInChildren<MeshRenderer>().material.mainTexture = displayTexture;
+		displayTex.material.mainTexture = displayTexture;
+		trailTex.material.mainTexture = trailMap;
 	}
 
 
@@ -95,7 +98,7 @@ public class Simulation2 : MonoBehaviour
 			// 	speciesMask = new Vector3Int((species == 1) ? 1 : 0, (species == 2) ? 1 : 0, (species == 3) ? 1 : 0);
 			// }
 
-			agents[i] = new Agent() { position = startPos, angle = angle};
+			agents[i] = new Agent() { position = startPos, angle = angle, color = Random.insideUnitSphere};
 		}
 
 		ComputeHelper.CreateAndSetBuffer<Agent>(ref agentBuffer, agents, compute, "agents", updateKernel);
@@ -141,6 +144,7 @@ public class Simulation2 : MonoBehaviour
 		// ComputeHelper.CreateStructuredBuffer(ref settingsBuffer, speciesSettings);
 		// compute.SetBuffer(updateKernel, "speciesSettings", settingsBuffer);
 		// compute.SetBuffer(colourKernel, "speciesSettings", settingsBuffer);
+		compute.SetBuffer(colourKernel, "agents", agentBuffer);
 
 		// Assign settings
 		compute.SetFloat("deltaTime", Time.fixedDeltaTime);
@@ -168,9 +172,10 @@ public class Simulation2 : MonoBehaviour
 	{
 		public Vector2 position;
 		public float angle;
-		public Vector3Int speciesMask;
-		int unusedSpeciesChannel;
-		public int speciesIndex;
+		public Vector3 color;
+		// public Vector3Int speciesMask;
+		// int unusedSpeciesChannel;
+		// public int speciesIndex;
 	}
 
 

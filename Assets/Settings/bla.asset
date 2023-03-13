@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: bla
   m_EditorClassIdentifier: 
   stepsPerFrame: 1
-  width: 1280
-  height: 720
-  numAgents: 1000
+  width: 100
+  height: 100
+  numAgents: 100
   spawnMode: 0
-  trailWeight: 1
-  decayRate: 1
-  diffuseRate: 1
+  trailWeight: 10.05
+  decayRate: 0.1
+  diffuseRate: 6.25
