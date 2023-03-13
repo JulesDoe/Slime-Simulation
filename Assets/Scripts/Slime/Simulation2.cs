@@ -2,13 +2,10 @@
 using UnityEngine.Experimental.Rendering;
 using ComputeShaderUtility;
 
-public class Simulation : MonoBehaviour
+public class Simulation2 : MonoBehaviour
 {
-	public enum SpawnMode { Random, Point, InwardCircle, RandomCircle }
+	// public enum SpawnMode { Random, Point, InwardCircle, RandomCircle }
 
-	public MeshRenderer trailMapDebug;
-	public MeshRenderer diffusedTrailMapDebug;
-	public MeshRenderer displayTextureDebug;
 	const int updateKernel = 0;
 	const int diffuseMapKernel = 1;
 	const int colourKernel = 2;
@@ -16,7 +13,7 @@ public class Simulation : MonoBehaviour
 	public ComputeShader compute;
 	public ComputeShader drawAgentsCS;
 
-	public SlimeSettings settings;
+	public SimulationSettings settings;
 
 	[Header("Display Settings")]
 	public bool showAgentsOnly;
@@ -35,9 +32,7 @@ public class Simulation : MonoBehaviour
 	protected virtual void Start()
 	{
 		Init();
-		trailMapDebug.material.mainTexture = trailMap;
-		diffusedTrailMapDebug.material.mainTexture = diffusedTrailMap;
-		displayTextureDebug.material.mainTexture = displayTexture;
+		transform.GetComponentInChildren<MeshRenderer>().material.mainTexture = displayTexture;
 	}
 
 
@@ -64,43 +59,43 @@ public class Simulation : MonoBehaviour
 			float randomAngle = Random.value * Mathf.PI * 2;
 			float angle = 0;
 
-			if (settings.spawnMode == SpawnMode.Point)
+			if (settings.spawnMode == Simulation.SpawnMode.Point)
 			{
 				startPos = centre;
 				angle = randomAngle;
 			}
-			else if (settings.spawnMode == SpawnMode.Random)
+			else if (settings.spawnMode == Simulation.SpawnMode.Random)
 			{
 				startPos = new Vector2(Random.Range(0, settings.width), Random.Range(0, settings.height));
 				angle = randomAngle;
 			}
-			else if (settings.spawnMode == SpawnMode.InwardCircle)
+			else if (settings.spawnMode == Simulation.SpawnMode.InwardCircle)
 			{
 				startPos = centre + Random.insideUnitCircle * settings.height * 0.5f;
 				angle = Mathf.Atan2((centre - startPos).normalized.y, (centre - startPos).normalized.x);
 			}
-			else if (settings.spawnMode == SpawnMode.RandomCircle)
+			else if (settings.spawnMode == Simulation.SpawnMode.RandomCircle)
 			{
 				startPos = centre + Random.insideUnitCircle * settings.height * 0.15f;
 				angle = randomAngle;
 			}
 
-			Vector3Int speciesMask;
-			int speciesIndex = 0;
-			int numSpecies = settings.speciesSettings.Length;
+			// Vector3Int speciesMask;
+			// int speciesIndex = 0;
+			// int numSpecies = settings.speciesSettings.Length;
 
-			if (numSpecies == 1)
-			{
-				speciesMask = Vector3Int.one;
-			}
-			else
-			{
-				int species = Random.Range(1, numSpecies + 1);
-				speciesIndex = species - 1;
-				speciesMask = new Vector3Int((species == 1) ? 1 : 0, (species == 2) ? 1 : 0, (species == 3) ? 1 : 0);
-			}
+			// if (numSpecies == 1)
+			// {
+			// 	speciesMask = Vector3Int.one;
+			// }
+			// else
+			// {
+			// 	int species = Random.Range(1, numSpecies + 1);
+			// 	speciesIndex = species - 1;
+			// 	speciesMask = new Vector3Int((species == 1) ? 1 : 0, (species == 2) ? 1 : 0, (species == 3) ? 1 : 0);
+			// }
 
-			agents[i] = new Agent() { position = startPos, angle = angle, speciesMask = speciesMask, speciesIndex = speciesIndex };
+			agents[i] = new Agent() { position = startPos, angle = angle};
 		}
 
 		ComputeHelper.CreateAndSetBuffer<Agent>(ref agentBuffer, agents, compute, "agents", updateKernel);
@@ -142,10 +137,10 @@ public class Simulation : MonoBehaviour
 
 	void RunSimulation()
 	{
-		var speciesSettings = settings.speciesSettings;
-		ComputeHelper.CreateStructuredBuffer(ref settingsBuffer, speciesSettings);
-		compute.SetBuffer(updateKernel, "speciesSettings", settingsBuffer);
-		compute.SetBuffer(colourKernel, "speciesSettings", settingsBuffer);
+		// var speciesSettings = settings.speciesSettings;
+		// ComputeHelper.CreateStructuredBuffer(ref settingsBuffer, speciesSettings);
+		// compute.SetBuffer(updateKernel, "speciesSettings", settingsBuffer);
+		// compute.SetBuffer(colourKernel, "speciesSettings", settingsBuffer);
 
 		// Assign settings
 		compute.SetFloat("deltaTime", Time.fixedDeltaTime);
@@ -154,7 +149,7 @@ public class Simulation : MonoBehaviour
 		compute.SetFloat("trailWeight", settings.trailWeight);
 		compute.SetFloat("decayRate", settings.decayRate);
 		compute.SetFloat("diffuseRate", settings.diffuseRate);
-		compute.SetInt("numSpecies", speciesSettings.Length);
+		// compute.SetInt("numSpecies", speciesSettings.Length);
 
 
 		ComputeHelper.Dispatch(compute, settings.numAgents, 1, 1, kernelIndex: updateKernel);
