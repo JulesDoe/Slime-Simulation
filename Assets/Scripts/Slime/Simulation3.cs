@@ -2,12 +2,13 @@
 using UnityEngine.Experimental.Rendering;
 using ComputeShaderUtility;
 
-public class Simulation2 : MonoBehaviour
+public class Simulation3 : MonoBehaviour
 {
-	// public enum SpawnMode { Random, Point, InwardCircle, RandomCircle }
+	public enum SpawnMode { Random, Point, InwardCircle, RandomCircle }
 
-public Renderer displayTex;
-public Renderer trailTex;
+	public MeshRenderer trailMapDebug;
+	public MeshRenderer diffusedTrailMapDebug;
+	public MeshRenderer displayTextureDebug;
 	const int updateKernel = 0;
 	const int diffuseMapKernel = 1;
 	const int colourKernel = 2;
@@ -15,7 +16,7 @@ public Renderer trailTex;
 	public ComputeShader compute;
 	public ComputeShader drawAgentsCS;
 
-	public SimulationSettings settings;
+	public SlimeSettings settings;
 
 	[Header("Display Settings")]
 	public bool showAgentsOnly;
@@ -34,8 +35,9 @@ public Renderer trailTex;
 	protected virtual void Start()
 	{
 		Init();
-		displayTex.material.mainTexture = displayTexture;
-		trailTex.material.mainTexture = trailMap;
+		trailMapDebug.material.mainTexture = trailMap;
+		diffusedTrailMapDebug.material.mainTexture = diffusedTrailMap;
+		displayTextureDebug.material.mainTexture = displayTexture;
 	}
 
 
@@ -62,44 +64,43 @@ public Renderer trailTex;
 			float randomAngle = Random.value * Mathf.PI * 2;
 			float angle = 0;
 
-			if (settings.spawnMode == Simulation.SpawnMode.Point)
-			{
-				startPos = centre;
-				angle = randomAngle;
-			}
-			else if (settings.spawnMode == Simulation.SpawnMode.Random)
-			{
+			// if (settings.spawnMode == SpawnMode.Point)
+			// {
+			// 	startPos = centre;
+			// 	angle = randomAngle;
+			// }
+			// else if (settings.spawnMode == SpawnMode.Random)
+			// {
 				startPos = new Vector2(Random.Range(0, settings.width), Random.Range(0, settings.height));
 				angle = randomAngle;
-			}
-			else if (settings.spawnMode == Simulation.SpawnMode.InwardCircle)
-			{
-				startPos = centre + Random.insideUnitCircle * settings.height * 0.5f;
-				angle = Mathf.Atan2((centre - startPos).normalized.y, (centre - startPos).normalized.x);
-			}
-			else if (settings.spawnMode == Simulation.SpawnMode.RandomCircle)
-			{
-				startPos = centre + Random.insideUnitCircle * settings.height * 0.15f;
-				angle = randomAngle;
-			}
-
-			// Vector3Int speciesMask;
-			// int speciesIndex = 0;
-			// int numSpecies = settings.speciesSettings.Length;
-
-			// if (numSpecies == 1)
-			// {
-			// 	speciesMask = Vector3Int.one;
 			// }
-			// else
+			// else if (settings.spawnMode == SpawnMode.InwardCircle)
 			// {
-			// 	int species = Random.Range(1, numSpecies + 1);
-			// 	speciesIndex = species - 1;
-			// 	speciesMask = new Vector3Int((species == 1) ? 1 : 0, (species == 2) ? 1 : 0, (species == 3) ? 1 : 0);
+			// 	startPos = centre + Random.insideUnitCircle * settings.height * 0.5f;
+			// 	angle = Mathf.Atan2((centre - startPos).normalized.y, (centre - startPos).normalized.x);
+			// }
+			// else if (settings.spawnMode == SpawnMode.RandomCircle)
+			// {
+			// 	startPos = centre + Random.insideUnitCircle * settings.height * 0.15f;
+			// 	angle = randomAngle;
 			// }
 
-			// agents[i] = new Agent() { position = startPos, angle = angle, color = Random.insideUnitSphere};
-			agents[i] = new Agent() { position = startPos, angle = angle, color = new Vector3(1,0,0)};
+			Vector3Int speciesMask;
+			int speciesIndex = 0;
+			int numSpecies = settings.speciesSettings.Length;
+
+			if (numSpecies == 1)
+			{
+				speciesMask = Vector3Int.one;
+			}
+			else
+			{
+				int species = Random.Range(1, numSpecies + 1);
+				speciesIndex = species - 1;
+				speciesMask = new Vector3Int((species == 1) ? 1 : 0, (species == 2) ? 1 : 0, (species == 3) ? 1 : 0);
+			}
+
+			agents[i] = new Agent() { position = startPos, angle = angle, speciesMask = speciesMask, speciesIndex = speciesIndex };
 		}
 
 		ComputeHelper.CreateAndSetBuffer<Agent>(ref agentBuffer, agents, compute, "agents", updateKernel);
@@ -141,11 +142,10 @@ public Renderer trailTex;
 
 	void RunSimulation()
 	{
-		// var speciesSettings = settings.speciesSettings;
-		// ComputeHelper.CreateStructuredBuffer(ref settingsBuffer, speciesSettings);
-		// compute.SetBuffer(updateKernel, "speciesSettings", settingsBuffer);
-		// compute.SetBuffer(colourKernel, "speciesSettings", settingsBuffer);
-		compute.SetBuffer(colourKernel, "agents", agentBuffer);
+		var speciesSettings = settings.speciesSettings;
+		ComputeHelper.CreateStructuredBuffer(ref settingsBuffer, speciesSettings);
+		compute.SetBuffer(updateKernel, "speciesSettings", settingsBuffer);
+		compute.SetBuffer(colourKernel, "speciesSettings", settingsBuffer);
 
 		// Assign settings
 		compute.SetFloat("deltaTime", Time.fixedDeltaTime);
@@ -154,7 +154,7 @@ public Renderer trailTex;
 		compute.SetFloat("trailWeight", settings.trailWeight);
 		compute.SetFloat("decayRate", settings.decayRate);
 		compute.SetFloat("diffuseRate", settings.diffuseRate);
-		// compute.SetInt("numSpecies", speciesSettings.Length);
+		compute.SetInt("numSpecies", speciesSettings.Length);
 
 
 		ComputeHelper.Dispatch(compute, settings.numAgents, 1, 1, kernelIndex: updateKernel);
@@ -173,10 +173,9 @@ public Renderer trailTex;
 	{
 		public Vector2 position;
 		public float angle;
-		public Vector3 color;
-		// public Vector3Int speciesMask;
-		// int unusedSpeciesChannel;
-		// public int speciesIndex;
+		public Vector3Int speciesMask;
+		int unusedSpeciesChannel;
+		public int speciesIndex;
 	}
 
 

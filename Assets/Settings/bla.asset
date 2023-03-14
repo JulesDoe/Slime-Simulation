@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b602e33845880d4fa2e964427e4134e, type: 3}
   m_Name: bla
   m_EditorClassIdentifier: 
-  stepsPerFrame: 1
-  width: 100
-  height: 100
-  numAgents: 100
+  stepsPerFrame: 11
+  width: 500
+  height: 500
+  numAgents: 1000
   spawnMode: 0
-  trailWeight: 10.05
-  decayRate: 0.1
-  diffuseRate: 6.25
+  trailWeight: 1
+  decayRate: 0.05
+  diffuseRate: 0.5
