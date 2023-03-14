@@ -33,6 +33,9 @@ float trailWeight;
 float deltaTime;
 float time;
 
+Texture2D<float> AngleMap;
+
+
 // Hash function www.cs.ubc.ca/~rbridson/docs/schechter-sca08-turbulence.pdf
 uint hash(uint state)
 {
@@ -52,7 +55,7 @@ float scaleToRange01(uint state)
 
 
 float sense(Agent agent, SpeciesSettings settings, float sensorAngleOffset) {
-	float sensorAngle = agent.angle + sensorAngleOffset;
+	float sensorAngle =  agent.angle + sensorAngleOffset;
 	float2 sensorDir = float2(cos(sensorAngle), sin(sensorAngle));
 
 	float2 sensorPos = agent.position + sensorDir * settings.sensorOffsetDst;
@@ -119,7 +122,8 @@ void Update (uint3 id : SV_DispatchThreadID)
 
 	// Update position
 	float2 direction = float2(cos(agent.angle), sin(agent.angle));
-	float2 newPos = agent.position + direction * deltaTime * settings.moveSpeed;
+	// float2 newPos = agent.position + direction * deltaTime * settings.moveSpeed;
+	float2 newPos = agent.position + direction * deltaTime * settings.moveSpeed * AngleMap[agent.position];
 
 	
 	// Clamp position to map boundaries, and pick new random move dir if hit boundary

@@ -1055,17 +1055,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 2048205024}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0173053465a956443813261665491110, type: 3}
+  m_Script: {fileID: 11500000, guid: 0ec725fffb9782e40b14918a5b7cb450, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   trailMapDebug: {fileID: 1098626416}
   diffusedTrailMapDebug: {fileID: 1117689255}
   displayTextureDebug: {fileID: 1102858322}
+  angleMap: {fileID: 2800000, guid: 4123f5e34d6fe4247927b5ee238916f7, type: 3}
   compute: {fileID: 7200000, guid: c6f4b19beafb8d34c8250536bd11d0bf, type: 3}
   drawAgentsCS: {fileID: 7200000, guid: 9d6969cce8474ed4899115f5d816b0a5, type: 3}
   settings: {fileID: 11400000, guid: 9c3e6966d7b740a498994ec6f23602d3, type: 2}
   showAgentsOnly: 0
-  filterMode: 1
+  filterMode: 0
   format: 48
   trailMap: {fileID: 0}
   diffusedTrailMap: {fileID: 0}
