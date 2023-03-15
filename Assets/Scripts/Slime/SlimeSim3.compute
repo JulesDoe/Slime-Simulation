@@ -14,7 +14,7 @@ struct SpeciesSettings {
 	float sensorAngleDegrees;
 	float sensorOffsetDst;
 	int sensorSize;
-	float4 colour;
+	float4 colour; // 
 };
 
 StructuredBuffer<SpeciesSettings> speciesSettings;
@@ -33,7 +33,22 @@ float trailWeight;
 float deltaTime;
 float time;
 
-Texture2D<float> AngleMap;
+// data will be encodet in fewer multichanel textures instead of more single chanel ones
+// https://forums.developer.nvidia.com/t/multiple-textures-vs-single-multichannel-texures-which-is-faster/3825
+Texture2D<float> ParameterMap; 
+// movement Speed
+// turn speed
+
+Texture2D<float3> ParameterMap2; 
+// sensorAngleDegrees;
+// sensorOffsetDst;
+// sensorSize;
+// free 
+Texture2D<float3> ColorMap; 
+// well color
+
+
+SamplerState sampler_linear_repeat; 
 
 
 // Hash function www.cs.ubc.ca/~rbridson/docs/schechter-sca08-turbulence.pdf
@@ -90,6 +105,8 @@ void Update (uint3 id : SV_DispatchThreadID)
 	Agent agent = agents[id.x];
 	SpeciesSettings settings = speciesSettings[agent.speciesIndex];
 	float2 pos = agent.position;
+	float2 posUV = float2 (agent.position.x/width, agent.position.y/height);
+
 
 	uint random = hash(pos.y * width + pos.x + hash(id.x + time * 100000));
 
@@ -123,7 +140,8 @@ void Update (uint3 id : SV_DispatchThreadID)
 	// Update position
 	float2 direction = float2(cos(agent.angle), sin(agent.angle));
 	// float2 newPos = agent.position + direction * deltaTime * settings.moveSpeed;
-	float2 newPos = agent.position + direction * deltaTime * settings.moveSpeed * AngleMap[agent.position];
+	float intensity = AngleMap.SampleLevel(sampler_linear_repeat, posUV, 0);
+	float2 newPos = agent.position + direction * deltaTime * settings.moveSpeed * intensity;
 
 	
 	// Clamp position to map boundaries, and pick new random move dir if hit boundary
