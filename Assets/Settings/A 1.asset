@@ -18,8 +18,8 @@ MonoBehaviour:
   numAgents: 1000000
   spawnMode: 2
   trailWeight: 1
-  decayRate: 0.02
-  diffuseRate: 1
+  decayRate: 0.2
+  diffuseRate: 0.5
   speciesSettings:
   - moveSpeed: 10
     turnSpeed: 2

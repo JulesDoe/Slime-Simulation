@@ -3,6 +3,7 @@
 struct Agent {
 	float2 position;
 	float angle;
+	float age;
 	int4 speciesMask;
 	int speciesIndex;
 };
@@ -104,7 +105,9 @@ void Update (uint3 id : SV_DispatchThreadID)
 
 	Agent agent = agents[id.x];
 	SpeciesSettings settings = speciesSettings[agent.speciesIndex];
-		
+	
+
+
 	float2 pos = agent.position;
 	float2 posUV = float2 (agent.position.x/width, agent.position.y/height);
 
@@ -119,6 +122,13 @@ void Update (uint3 id : SV_DispatchThreadID)
 	int sensorSize = settings.sensorSize * parameters2.z;
 
 	uint random = hash(pos.y * width + pos.x + hash(id.x + time * 100000));
+	uint random2 = hash(pos.x * height + pos.y + hash(id.x + time * 10000));
+
+	agent.age += deltaTime; 
+	if(agent.age > 10){
+		agent.position = float2(width * random, height * random2);
+		agent.age = 0;
+	}
 
 	// Steer based on sensory data
 	float sensorAngleRad = settings.sensorAngleDegrees * sensorAngleDegrees*  (3.1415 / 180);

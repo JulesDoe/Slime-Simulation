@@ -91,7 +91,7 @@ public class Simulation3 : MonoBehaviour
                 speciesMask = new Vector3Int((species == 1) ? 1 : 0, (species == 2) ? 1 : 0, (species == 3) ? 1 : 0);
             }
 
-            agents[i] = new Agent() { position = startPos, angle = angle, speciesMask = speciesMask, speciesIndex = speciesIndex };
+            agents[i] = new Agent() { position = startPos, angle = angle, age = 0f, speciesMask = speciesMask, speciesIndex = speciesIndex };
         }
 
         ComputeHelper.CreateAndSetBuffer<Agent>(ref agentBuffer, agents, compute, "agents", updateKernel);
@@ -164,6 +164,7 @@ public class Simulation3 : MonoBehaviour
     {
         public Vector2 position;
         public float angle;
+        public float age;
         public Vector3Int speciesMask;
         int unusedSpeciesChannel;
         public int speciesIndex;
