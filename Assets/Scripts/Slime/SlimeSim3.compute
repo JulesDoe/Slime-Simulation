@@ -29,13 +29,12 @@ int width;
 int height;
 
 float trailWeight;
-
 float deltaTime;
 float time;
 
 // data will be encodet in fewer multichanel textures instead of more single chanel ones
 // https://forums.developer.nvidia.com/t/multiple-textures-vs-single-multichannel-texures-which-is-faster/3825
-Texture2D<float> ParameterMap; 
+Texture2D<float3> ParameterMap1; 
 // movement Speed
 // turn speed
 
@@ -43,8 +42,8 @@ Texture2D<float3> ParameterMap2;
 // sensorAngleDegrees;
 // sensorOffsetDst;
 // sensorSize;
-// free 
-Texture2D<float3> ColorMap; 
+
+Texture2D<float4> ColorMap; 
 // well color
 
 
@@ -69,11 +68,11 @@ float scaleToRange01(uint state)
 }
 
 
-float sense(Agent agent, SpeciesSettings settings, float sensorAngleOffset) {
+float sense(Agent agent, float sensorAngleOffset, float sensorOffsetDst, float sensorSize) {
 	float sensorAngle =  agent.angle + sensorAngleOffset;
 	float2 sensorDir = float2(cos(sensorAngle), sin(sensorAngle));
 
-	float2 sensorPos = agent.position + sensorDir * settings.sensorOffsetDst;
+	float2 sensorPos = agent.position + sensorDir * sensorOffsetDst;
 	int sensorCentreX = (int) sensorPos.x;
 	int sensorCentreY = (int) sensorPos.y;
 
@@ -82,8 +81,9 @@ float sense(Agent agent, SpeciesSettings settings, float sensorAngleOffset) {
 	// int4 senseWeight = agent.speciesMask * 2 - 1;
 	// int4 senseWeight = int4(1,0,0,0);
 
-	for (int offsetX = -settings.sensorSize; offsetX <= settings.sensorSize; offsetX ++) {
-		for (int offsetY = -settings.sensorSize; offsetY <= settings.sensorSize; offsetY ++) {
+
+	for (int offsetX = -sensorSize; offsetX <= sensorSize; offsetX ++) {
+		for (int offsetY = -sensorSize; offsetY <= sensorSize; offsetY ++) {
 			int sampleX = min(width - 1, max(0, sensorCentreX + offsetX));
 			int sampleY = min(height - 1, max(0, sensorCentreY + offsetY));
 			// sum += dot(senseWeight, TrailMap[int2(sampleX,sampleY)]);
@@ -104,25 +104,36 @@ void Update (uint3 id : SV_DispatchThreadID)
 
 	Agent agent = agents[id.x];
 	SpeciesSettings settings = speciesSettings[agent.speciesIndex];
+		
 	float2 pos = agent.position;
 	float2 posUV = float2 (agent.position.x/width, agent.position.y/height);
 
+	// settings
+	float3 parameters1 = ParameterMap1.SampleLevel(sampler_linear_repeat, posUV, 0); 
+	float mapMoveSpeed = parameters1.x;
+	float mapTurnSpeed = parameters1.y;
+	
+	float3 parameters2 = ParameterMap2.SampleLevel(sampler_linear_repeat, posUV, 0); 
+	float sensorAngleDegrees = parameters2.x;
+	float sensorOffsetDst = settings.sensorOffsetDst * parameters2.y;
+	int sensorSize = settings.sensorSize * parameters2.z;
 
 	uint random = hash(pos.y * width + pos.x + hash(id.x + time * 100000));
 
 	// Steer based on sensory data
-	float sensorAngleRad = settings.sensorAngleDegrees * (3.1415 / 180);
-	float weightForward = sense(agent, settings, 0);
-	float weightLeft = sense(agent, settings, sensorAngleRad);
-	float weightRight = sense(agent, settings, -sensorAngleRad);
+	float sensorAngleRad = settings.sensorAngleDegrees * sensorAngleDegrees*  (3.1415 / 180);
+	float weightForward = sense(agent, 0, sensorOffsetDst , sensorSize);
+	float weightLeft = sense(agent, sensorAngleRad, sensorOffsetDst, sensorSize);
+	float weightRight = sense(agent, -sensorAngleRad, sensorOffsetDst, sensorSize);
 
 	
 	float randomSteerStrength = scaleToRange01(random);
-	float turnSpeed = settings.turnSpeed * 2 * 3.1415;
+	// float turnSpeed = settings.turnSpeed * 2 * 3.1415;
+	float turnSpeed = mapTurnSpeed * 2 * 3.1415;
 
 	// Continue in same direction
 	if (weightForward > weightLeft && weightForward > weightRight) {
-		agents[id.x].angle += 0;
+		agents[id.x].angle += 0 + randomSteerStrength - 0.5;
 	}
 	else if (weightForward < weightLeft && weightForward < weightRight) {
 		agents[id.x].angle += (randomSteerStrength - 0.5) * 2 * turnSpeed * deltaTime;
@@ -140,8 +151,8 @@ void Update (uint3 id : SV_DispatchThreadID)
 	// Update position
 	float2 direction = float2(cos(agent.angle), sin(agent.angle));
 	// float2 newPos = agent.position + direction * deltaTime * settings.moveSpeed;
-	float intensity = AngleMap.SampleLevel(sampler_linear_repeat, posUV, 0);
-	float2 newPos = agent.position + direction * deltaTime * settings.moveSpeed * intensity;
+
+	float2 newPos = agent.position + direction * deltaTime * settings.moveSpeed * mapMoveSpeed;
 
 	
 	// Clamp position to map boundaries, and pick new random move dir if hit boundary
@@ -156,7 +167,11 @@ void Update (uint3 id : SV_DispatchThreadID)
 	else {
 		int2 coord = int2(newPos);
 		float4 oldTrail = TrailMap[coord];
-		TrailMap[coord] = min(1, oldTrail + speciesSettings[agent.speciesIndex].colour * trailWeight * deltaTime);
+
+		float2 newPosUV = float2 (newPos.x /width, newPos.y /height);
+		float4 localColor = ColorMap.SampleLevel(sampler_linear_repeat, newPosUV, 0);
+
+		TrailMap[coord] = min(1, oldTrail + localColor * trailWeight * deltaTime);
 	}
 	
 	agents[id.x].position = newPos;

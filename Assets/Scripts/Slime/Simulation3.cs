@@ -9,7 +9,9 @@ public class Simulation3 : MonoBehaviour
     public MeshRenderer trailMapDebug;
     public MeshRenderer diffusedTrailMapDebug;
     public MeshRenderer displayTextureDebug;
-    public Texture2D angleMap;
+    public Texture parameterMap1;
+    public Texture parameterMap2;
+    public Texture colorMap;
     const int updateKernel = 0;
     const int diffuseMapKernel = 1;
 	
@@ -52,7 +54,9 @@ public class Simulation3 : MonoBehaviour
 
         // Assign textures
         compute.SetTexture(updateKernel, "TrailMap", trailMap);
-        compute.SetTexture(updateKernel, "AngleMap", angleMap);
+        compute.SetTexture(updateKernel, "ParameterMap1", parameterMap1);
+        compute.SetTexture(updateKernel, "ParameterMap2", parameterMap2);
+        compute.SetTexture(updateKernel, "ColorMap", colorMap);
         compute.SetTexture(diffuseMapKernel, "TrailMap", trailMap);
         compute.SetTexture(diffuseMapKernel, "DiffusedTrailMap", diffusedTrailMap);
         compute.SetTexture(colourKernel, "ColourMap", displayTexture);

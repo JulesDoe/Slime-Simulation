@@ -13,29 +13,29 @@ MonoBehaviour:
   m_Name: LH1
   m_EditorClassIdentifier: 
   stepsPerFrame: 1
-  width: 3500
-  height: 1500
+  width: 7000
+  height: 3500
   numAgents: 1000000
   spawnMode: 0
-  trailWeight: 2
-  decayRate: 0.1
-  diffuseRate: 0.1
+  trailWeight: 1
+  decayRate: 1
+  diffuseRate: 30
   speciesSettings:
-  - moveSpeed: 5
-    turnSpeed: 10
-    sensorAngleSpacing: 60
-    sensorOffsetDst: 10
-    sensorSize: 1
+  - moveSpeed: 10
+    turnSpeed: 5
+    sensorAngleSpacing: 50
+    sensorOffsetDst: 5
+    sensorSize: 5
     colour: {r: 1, g: 0.062745094, b: 0.14645998, a: 0}
   - moveSpeed: 5
-    turnSpeed: 5
+    turnSpeed: 10
     sensorAngleSpacing: 30
-    sensorOffsetDst: 30
+    sensorOffsetDst: 1
     sensorSize: 1
     colour: {r: 0.10588236, g: 0.1926775, b: 0.83137256, a: 0}
   - moveSpeed: 5
     turnSpeed: 30
     sensorAngleSpacing: 90
-    sensorOffsetDst: 10
+    sensorOffsetDst: 1
     sensorSize: 1
     colour: {r: 1, g: 0, b: 0.86839294, a: 0}
