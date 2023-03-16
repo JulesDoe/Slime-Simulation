@@ -17,8 +17,8 @@ MonoBehaviour:
   height: 1080
   numAgents: 1000000
   spawnMode: 2
-  trailWeight: 5
-  decayRate: 0.05
+  trailWeight: 1
+  decayRate: 0.02
   diffuseRate: 1
   speciesSettings:
   - moveSpeed: 10

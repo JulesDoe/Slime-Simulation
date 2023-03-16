@@ -1879,7 +1879,7 @@ MonoBehaviour:
   colorMap: {fileID: 8400000, guid: b4216794fee1f444ab510253e07858cf, type: 2}
   compute: {fileID: 7200000, guid: c6f4b19beafb8d34c8250536bd11d0bf, type: 3}
   drawAgentsCS: {fileID: 7200000, guid: 9d6969cce8474ed4899115f5d816b0a5, type: 3}
-  settings: {fileID: 11400000, guid: b4bd879e1f386d84eaf103b21d3c832b, type: 2}
+  settings: {fileID: 11400000, guid: ff6ca5323d535f74e8f0bddeeb12ddac, type: 2}
   showAgentsOnly: 0
   filterMode: 0
   format: 48
