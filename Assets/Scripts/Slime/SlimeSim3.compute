@@ -95,7 +95,7 @@ float sense(Agent agent, float sensorAngleOffset, float sensorOffsetDst, float s
 	return sum;
 }
 
-[numthreads(16,1,1)]
+[numthreads(64,1,1)]
 void Update (uint3 id : SV_DispatchThreadID)
 {
 	if (id.x >= numAgents) {
