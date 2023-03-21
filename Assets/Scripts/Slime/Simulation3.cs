@@ -9,9 +9,15 @@ public class Simulation3 : MonoBehaviour
     public MeshRenderer trailMapDebug;
     public MeshRenderer diffusedTrailMapDebug;
     public MeshRenderer displayTextureDebug;
-    public Texture parameterMap1;
-    public Texture parameterMap2;
-    public Texture colorMap;
+    public MeshRenderer parameterMap1Debug;
+    public MeshRenderer parameterMap2Debug;
+    public MeshRenderer colorMapDebug;
+    public Camera colorMapCamer;
+    public Camera parameterMap1Camera;
+    public Camera parameterMap2Camera;
+    RenderTexture parameterMap1;
+    RenderTexture parameterMap2;
+    RenderTexture colorMap;
     const int updateKernel = 0;
     const int diffuseMapKernel = 1;
 	
@@ -42,6 +48,14 @@ public class Simulation3 : MonoBehaviour
         trailMapDebug.material.mainTexture = trailMap;
         diffusedTrailMapDebug.material.mainTexture = diffusedTrailMap;
         displayTextureDebug.material.mainTexture = displayTexture;
+
+        colorMapCamer.targetTexture = colorMap;
+        parameterMap1Camera.targetTexture = parameterMap1;
+        parameterMap2Camera.targetTexture = parameterMap2;
+
+        parameterMap1Debug.material.mainTexture = parameterMap1;
+        parameterMap2Debug.material.mainTexture = parameterMap2;
+        colorMapDebug.material.mainTexture = colorMap;
     }
 
 
@@ -51,6 +65,13 @@ public class Simulation3 : MonoBehaviour
         ComputeHelper.CreateRenderTexture(ref trailMap, settings.width, settings.height, filterMode, format);
         ComputeHelper.CreateRenderTexture(ref diffusedTrailMap, settings.width, settings.height, filterMode, format);
         ComputeHelper.CreateRenderTexture(ref displayTexture, settings.width, settings.height, filterMode, format);
+
+        int parameterMapWidth = settings.width / settings.parameterMapSubSamplingFactor ;
+        int parameterMapHeight = settings.height / settings.parameterMapSubSamplingFactor ;
+        ComputeHelper.CreateRenderTexture(ref parameterMap1, parameterMapWidth, parameterMapHeight, filterMode, format);
+        ComputeHelper.CreateRenderTexture(ref parameterMap2, parameterMapWidth, parameterMapHeight, filterMode, format);
+        ComputeHelper.CreateRenderTexture(ref colorMap,      parameterMapWidth, parameterMapHeight, filterMode, format);
+
 
         // Assign textures
         compute.SetTexture(updateKernel, "TrailMap", trailMap);

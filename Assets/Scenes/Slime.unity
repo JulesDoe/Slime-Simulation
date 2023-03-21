@@ -190,11 +190,11 @@ Camera:
   m_TargetTexture: {fileID: 8400000, guid: b4216794fee1f444ab510253e07858cf, type: 2}
   m_TargetDisplay: 0
   m_TargetEye: 3
-  m_HDR: 1
-  m_AllowMSAA: 1
+  m_HDR: 0
+  m_AllowMSAA: 0
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
-  m_OcclusionCulling: 1
+  m_OcclusionCulling: 0
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
 --- !u!1 &263095574
@@ -209,7 +209,7 @@ GameObject:
   - component: {fileID: 263095577}
   - component: {fileID: 263095576}
   m_Layer: 0
-  m_Name: Trail Map (3)
+  m_Name: ColorMap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -290,7 +290,7 @@ GameObject:
   - component: {fileID: 320658546}
   - component: {fileID: 320658545}
   m_Layer: 0
-  m_Name: Trail Map (1)
+  m_Name: ParameterMap1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -452,7 +452,7 @@ GameObject:
   m_Component:
   - component: {fileID: 596424952}
   m_Layer: 0
-  m_Name: Property Writer
+  m_Name: Property Writer (duplicate and move to draw)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1202,11 +1202,11 @@ Camera:
   m_TargetTexture: {fileID: 8400000, guid: 21abf948ab945cc4fb8f16788d3ae4fc, type: 2}
   m_TargetDisplay: 0
   m_TargetEye: 3
-  m_HDR: 1
-  m_AllowMSAA: 1
+  m_HDR: 0
+  m_AllowMSAA: 0
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
-  m_OcclusionCulling: 1
+  m_OcclusionCulling: 0
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
 --- !u!4 &1245448803
@@ -1693,11 +1693,11 @@ Camera:
   m_TargetTexture: {fileID: 8400000, guid: 51d3172918806444cad5a31a29eb5ca8, type: 2}
   m_TargetDisplay: 0
   m_TargetEye: 3
-  m_HDR: 1
-  m_AllowMSAA: 1
+  m_HDR: 0
+  m_AllowMSAA: 0
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
-  m_OcclusionCulling: 1
+  m_OcclusionCulling: 0
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
 --- !u!1 &1799989355
@@ -1712,7 +1712,7 @@ GameObject:
   - component: {fileID: 1799989358}
   - component: {fileID: 1799989357}
   m_Layer: 0
-  m_Name: Trail Map (2)
+  m_Name: ParameterMap2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1874,9 +1874,12 @@ MonoBehaviour:
   trailMapDebug: {fileID: 1098626416}
   diffusedTrailMapDebug: {fileID: 1117689255}
   displayTextureDebug: {fileID: 1102858322}
-  parameterMap1: {fileID: 8400000, guid: 21abf948ab945cc4fb8f16788d3ae4fc, type: 2}
-  parameterMap2: {fileID: 8400000, guid: 51d3172918806444cad5a31a29eb5ca8, type: 2}
-  colorMap: {fileID: 8400000, guid: b4216794fee1f444ab510253e07858cf, type: 2}
+  parameterMap1Debug: {fileID: 320658545}
+  parameterMap2Debug: {fileID: 1799989357}
+  colorMapDebug: {fileID: 263095576}
+  colorMapCamer: {fileID: 14666759}
+  parameterMap1Camera: {fileID: 1245448802}
+  parameterMap2Camera: {fileID: 1781624070}
   compute: {fileID: 7200000, guid: c6f4b19beafb8d34c8250536bd11d0bf, type: 3}
   drawAgentsCS: {fileID: 7200000, guid: 9d6969cce8474ed4899115f5d816b0a5, type: 3}
   settings: {fileID: 11400000, guid: ff6ca5323d535f74e8f0bddeeb12ddac, type: 2}
